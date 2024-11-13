@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Clustering for PowerPoint</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 10px;
+            width: 1000px;
+            height: 700px;
+            margin: auto;
+            box-sizing: border-box;
+        }
+
+        .chart-container {
+            width: 45%;
+            max-width: 400px;
+        }
+
+        .description-container {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cluster-description {
+            padding: 8px;
+            border-radius: 5px;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .cluster-0 {
+            background-color: #e8000b;
+        }
+
+        .cluster-1 {
+            background-color: #1ac938;
+        }
+
+        .cluster-2 {
+            background-color: #023eff;
+        }
+
+        .cluster-3 {
+            background-color: #ffa500;
+        }
+
+        .cluster-4 {
+            background-color: #ff34b3;
+        }
+
+        h2,
+        h3 {
+            margin: 0;
+            font-size: 1.1em;
+        }
+
+        ul {
+            padding-left: 15px;
+            margin: 5px 0 0 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="chart-container">
+        <canvas id="customerPieChart"></canvas>
+    </div>
+
+    <div class="description-container">
+        <h2 style="color:#d32f2f; font-size:1.2em;">Customer Descriptions and Insights</h2>
+
+        <div class="cluster-description cluster-0">
+            <h3>Cluster 0 - Budget-Conscious</h3>
+            <ul>
+                <li><strong>Profile:</strong> Low-value, infrequent purchases.</li>
+                <li><strong>Behavior:</strong> Weekend shoppers, price-sensitive.</li>
+                <li><strong>Recommendation:</strong> Loyalty rewards, weekend discounts.</li>
+            </ul>
+        </div>
+
+        <div class="cluster-description cluster-1">
+            <h3>Cluster 1 - Standard Spenders</h3>
+            <ul>
+                <li><strong>Profile:</strong> Balanced spenders, steady habits.</li>
+                <li><strong>Behavior:</strong> Evening shopping.</li>
+                <li><strong>Recommendation:</strong> Evening promotions, personalized offers.</li>
+            </ul>
+        </div>
+
+        <div class="cluster-description cluster-2">
+            <h3>Cluster 2 - High-Frequency, Low-Value</h3>
+            <ul>
+                <li><strong>Profile:</strong> Frequent small transactions.</li>
+                <li><strong>Behavior:</strong> Active in early evenings.</li>
+                <li><strong>Recommendation:</strong> Flash sales, time-sensitive discounts.</li>
+            </ul>
+        </div>
+
+        <div class="cluster-description cluster-3">
+            <h3>Cluster 3 - Premium Weekend Shoppers</h3>
+            <ul>
+                <li><strong>Profile:</strong> High spenders on weekends.</li>
+                <li><strong>Behavior:</strong> Mid-morning to afternoon.</li>
+                <li><strong>Recommendation:</strong> VIP membership, personalized offers.</li>
+            </ul>
+        </div>
+
+        <div class="cluster-description cluster-4">
+            <h3>Cluster 4 - Loyal High-Value</h3>
+            <ul>
+                <li><strong>Profile:</strong> Occasional high-value, brand loyal.</li>
+                <li><strong>Behavior:</strong> Midweek, midday shopping.</li>
+                <li><strong>Recommendation:</strong> Exclusive memberships, referral incentives.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('customerPieChart').getContext('2d');
+        const customerPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Cluster 0', 'Cluster 1', 'Cluster 2', 'Cluster 3', 'Cluster 4'],
+                datasets: [{
+                    data: [31.33, 24.02, 22.57, 21.39, 0.69], // Example percentages
+                    backgroundColor: ['#e8000b', '#1ac938', '#023eff', '#ffa500', '#ff34b3'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    },
+                    datalabels: {
+                        color: '#ffffff',
+                        formatter: (value, ctx) => {
+                            let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            let percentage = (value * 100 / sum).toFixed(2) + "%";
+                            return percentage;
+                        },
+                        font: {
+                            weight: 'bold',
+                            size: 12
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+@startuml Hybrid_Recommendation_System_Workflow
+!theme plain
+title Hybrid Recommendation System Overview
+
+actor User
+
+rectangle "New User Onboarding" {
+    User --> (Search Query)
+    User --> (Content-Based Recommendations)
+}
+
+rectangle "Search System" {
+    (Search Query) --> (Keyword Matching) : Uses user's search terms
+    (Keyword Matching) --> (Personalized Suggestions) : Based on product descriptions, tags, etc.
+}
+
+rectangle "Content-Based Filtering" {
+    (Content-Based Recommendations) --> (Product Attributes) : Uses item descriptions, tags, etc.
+    (Product Attributes) --> (Top Products) : Recommends popular or trending items
+    (Top Products) --> (If Clicked, Log Interaction) : Logs user behavior for collaborative filtering
+}
+
+rectangle "Collaborative Filtering" {
+    (User Interactions) --> (Clustering) : Groups similar users based on behavior
+    (Clustering) --> (Find Similar Users) : Finds similar users with relevant behaviors
+    (Find Similar Users) --> (Recommend Items) : Recommends items liked by similar users
+}
+
+rectangle "Hybrid Recommendation Engine" {
+    (Search System) --> (Combine Results) : Combines search & recommendations
+    (Content-Based Filtering) --> (Combine Results)
+    (Collaborative Filtering) --> (Combine Results)
+    (Combine Results) --> (Final Recommendations) : Display top choices
+}
+
+rectangle "Data Logging & Model Retraining" {
+    (Final Recommendations) --> (Log User Choices) : Stores preferences
+    (Log User Choices) --> (Retrain Models) : Updates system to reflect new user preferences
+}
+
+@enduml

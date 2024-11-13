@@ -1,0 +1,77 @@
+@startuml Complete_Recommender_System_Architecture
+!theme blueprint
+title Recommender System Architecture 
+
+actor User
+
+rectangle "Frontend (Website)" {
+    User --> (Search Bar)
+    User --> (Product Page)
+    User --> (Recommendation Section)
+
+    (Search Bar) --> (Search System API) : React.js, Vue.js
+    (Product Page) --> (Recommendation API) : React.js, Vue.js
+    (Recommendation Section) --> (Recommendation API) : React.js, Vue.js
+}
+
+package "Backend API" {
+    [Recommendation API] --> [Recommendation Controller] : Flask, FastAPI, Django
+    [Search System API] --> [Search Controller] : Flask, FastAPI, Django
+
+    [Recommendation Controller] --> [Hybrid Recommendation Engine]
+    [Recommendation Controller] --> [Collaborative Filtering Engine]
+    [Recommendation Controller] --> [Content-Based Filtering Engine]
+    [Search Controller] --> [Search System]
+}
+
+package "Recommendation Engines" {
+    [Hybrid Recommendation Engine] --> [Collaborative Filtering Engine] : Python (Scikit-learn)
+    [Hybrid Recommendation Engine] --> [Content-Based Filtering Engine] : Python (Scikit-learn)
+}
+
+package "Search System" {
+    [Query Preprocessing] --> [Exact Match Search] : Python (NLTK, Spacy)
+    [Exact Match Search] --> [AI Vector Search] : TF-IDF (Scikit-learn)
+    [AI Vector Search] --> [Category Match] : Elasticsearch
+    [Category Match] --> [Word Search with Synonyms] : Elasticsearch
+    [Word Search with Synonyms] --> [Fuzzy Search] : FuzzyWuzzy
+}
+
+package "Model Training Pipeline" {
+    [Data Preprocessor] --> [Feature Engineering] : Python (Pandas, Numpy)
+    [Feature Engineering] --> [Collaborative Filtering Model Trainer] : Scikit-learn, Surprise
+    [Feature Engineering] --> [Content-Based Filtering Model Trainer] : Scikit-learn
+    [Collaborative Filtering Model Trainer] --> [Model Registry] : MLflow, ModelDB
+    [Content-Based Filtering Model Trainer] --> [Model Registry] : MLflow, ModelDB
+
+    [Data Preprocessor] -down-> [New Data Processor] : Apache Kafka, Apache Airflow
+    [New Data Processor] --> [Database] : Store New Data
+    [New Data Processor] --> [Trigger Model Retraining]
+    [Trigger Model Retraining] --> [Data Preprocessor]
+}
+
+package "Data Pipeline and Database" {
+    database "Recommendation Database" {
+        [User Behavior Data]
+        [Product Data]
+        [Search Data]
+        [User Ratings Data]
+        [Model Registry]
+    }
+}
+
+
+[Recommendation Database] --> [Search System] : Access Product & Search Data
+[Recommendation Database] --> [Collaborative Filtering Engine] : Access User Ratings
+[Recommendation Database] --> [Content-Based Filtering Engine] : Access Product Data
+
+[Recommendation API] --> [Hybrid Recommendation Engine] : Retrieve Recommendations
+[Search System API] --> [Search System] : Perform Search Query
+
+[Hybrid Recommendation Engine] --> [Recommendation Database] : Load Models from Model Registry
+[Collaborative Filtering Engine] --> [Recommendation Database] : Load Collaborative Model
+[Content-Based Filtering Engine] --> [Recommendation Database] : Load Content-Based Model
+
+[Recommendation Database] --> [New Data Processor] : Store New User Interactions & Ratings
+
+@enduml

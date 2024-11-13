@@ -1,0 +1,62 @@
+@startuml collaborative_based_recommender
+!theme bluegray
+
+title Collaborative Filtering Recommendation System Flow
+
+start
+
+:Load Data;
+:Initialize Reader with Purchase History;
+:Load Dataset with ID, ProductID_List, and Ratings;
+
+partition "Parameter Tuning and Model Training" {
+    :Define Parameter Grid for SVD Model;
+    :Perform Grid Search with Cross-Validation (measures: RMSE, MAE);
+    note right
+        Grid Search is used to find optimal parameters for the SVD 
+        model, tuning factors such as 'n_factors', 'n_epochs', 'lr_all', 
+        and 'reg_all'.
+    end note
+    :Fit SVD Model with Best Parameters on Training Data;
+}
+
+partition "Cross-Validation and Evaluation" {
+    :Perform Cross-Validation (5-fold) on Training Data;
+    :Calculate Average RMSE and MAE across folds;
+    note right
+        Cross-validation helps in assessing model stability 
+        and generalization by averaging metrics over multiple folds.
+    end note
+}
+
+partition "Generate Recommendations" {
+    :Predict Ratings for Test Data;
+    :Store Predictions;
+    note right
+        Using the best-trained model, predictions are generated 
+        for items in the test dataset based on user and item factors.
+    end note
+}
+
+partition "Top-N Recommendations" {
+    :Define Function to Extract Top N Recommendations for each User;
+    :Sort Predictions by Rating for each User;
+    :Select Top N Items;
+    note right
+        Extracting top-N recommendations involves sorting 
+        predictions and selecting the highest-rated items.
+    end note
+}
+
+partition "Output Recommendations" {
+    :Merge Top-N Items with Product Information (Name, etc.);
+    :Format Results with Predicted Ratings;
+    :Return Top-N Recommended Items for each User;
+    note right
+        The final output provides the user with a list of recommended items, 
+        including product names and predicted ratings for better insight.
+    end note
+}
+
+stop
+@enduml

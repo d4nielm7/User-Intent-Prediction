@@ -1,0 +1,62 @@
+@startuml hybrid_recommender
+!theme bluegray
+
+title Hybrid-Based Filtering Recommendation System Flow
+
+start
+
+:User Input: UserID, prod_name;
+:Check if Product Exists in Dataset;
+
+if (Product Exists?) then (Yes)
+    :Fetch Product Information;
+else (No)
+    :Return "Product '{prod_name}' not found in dataset";
+    stop;
+endif
+
+partition "Content-Based Similarity Calculation" {
+    :Retrieve Product Attributes (Name, Description, Tags, Brand, etc.);
+    :Concatenate attributes to create 'Combined_Text';
+    :Apply TF-IDF Vectorization on 'Combined_Text';
+    :Calculate Cosine Similarity between input product and dataset items;
+    note right
+        The content-based similarity measures how closely 
+        other items are related based on product features.
+    end note
+}
+
+partition "Collaborative Filtering (SVD)" {
+    :Check if UserID is Valid;
+    if (UserID Valid?) then (Yes)
+        :Use SVD Model to Predict Ratings for Similar Items;
+    else (No)
+        :Return "UserID not found or new user";
+        stop;
+    endif
+    note right
+        Collaborative filtering (SVD) leverages past user 
+        interactions to enhance recommendation relevance.
+    end note
+}
+
+partition "Merge Content-Based and Collaborative Scores" {
+    :Map Product Indices and Merge Scores;
+    :Sort Products by Combined Score (Weighted Content + Collaborative);
+    note right
+        Merging both scores ensures the hybrid system 
+        captures both item similarity and user preferences.
+    end note
+}
+
+partition "Generate Top Recommendations" {
+    :Select Top N Products with highest combined scores;
+    :Return list of recommended products with details;
+    note right
+        The final output displays the most relevant items, 
+        balancing user preferences with content similarity.
+    end note
+}
+
+stop
+@enduml

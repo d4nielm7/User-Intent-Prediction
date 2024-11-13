@@ -1,0 +1,93 @@
+@startuml content_based_recommender
+!theme bluegray
+
+title Content-Based Filtering Recommendation System Flow
+
+start
+
+:User Input: prod_id;
+:Check if Product Exists in Dataset;
+
+if (Product Exists?) then (Yes)
+    :Fetch Product Name using prod_id;
+else (No)
+    :Return "ProdID {prod_id} not found in dataset";
+    stop;
+endif
+
+partition "Combine Text Features" {
+    :Concatenate Name, Description, Tags, Brand, price_bin, and Category;
+    :Store result in df['Combined_Text'];
+    note right
+        Combining multiple text features into a single field 
+        helps capture more information about each item for 
+        similarity calculations.
+    end note
+}
+
+partition "TF-IDF Vectorization" {
+    :Initialize TfidfVectorizer with stop_words and ngram_range;
+    :Apply TF-IDF transformation to df['Combined_Text'];
+    :Convert product_name into input_vector;
+    note right
+        TF-IDF vectorization converts text data into numerical 
+        vectors, giving more weight to important terms and reducing 
+        the impact of common words.
+    end note
+}
+
+partition "Cosine Similarity Calculation" {
+    :Calculate cosine similarity between input_vector and tfidf_matrix;
+    :Store similarity scores for all items in 'Similarity' column;
+    note right
+        Cosine similarity measures the angle between vectors, 
+        quantifying how similar items are based on their content.
+    end note
+}
+
+partition "Create Similarities DataFrame" {
+    :Build a DataFrame with item attributes (ProdID, Name, Rating, etc.);
+    :Include 'Similarity' scores from cosine similarity calculation;
+    :Exclude the input item itself from recommendations;
+    note right
+        The DataFrame provides a structured format for recommendations, 
+        including similarity scores for ranking.
+    end note
+}
+
+partition "Normalize Scores" {
+    :Use MinMaxScaler to normalize Rating, RatingCount, and ReviewCount columns;
+    note right
+        Normalizing scores ensures that ratings and counts 
+        are comparable on a similar scale for fair weighting.
+    end note
+}
+
+partition "Calculate Final Score" {
+    :Compute weighted sum of normalized scores;
+    :Final_Score = 0.5 * Rating_Score + 0.3 * RatingCount_Score + 0.2 * ReviewCount_Score;
+    note right
+        Weighted scoring allows fine-tuning the influence 
+        of different attributes, enhancing recommendation relevance.
+    end note
+}
+
+partition "Rank and Select Top N Recommendations" {
+    :Sort items by Similarity and Final_Score in descending order;
+    :Select top N items based on sorted scores;
+    note right
+        Selecting the top recommendations ensures the most 
+        relevant items are shown to the user, limited by N.
+    end note
+}
+
+partition "Output Recommendations" {
+    :Return recommended items and their attributes:;;
+    note right
+        Displaying item details like Name, Rating, and Price 
+        provides users with context and helps build trust in the recommendations.
+    end note
+}
+
+stop
+@enduml

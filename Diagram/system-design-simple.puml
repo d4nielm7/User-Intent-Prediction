@@ -1,0 +1,38 @@
+@startuml Simple_Recommender_System_Architecture
+!theme blueprint
+title Simplified Recommender System Architecture
+
+actor User
+
+rectangle "Frontend (Website)" {
+    User --> (Search Bar)
+    User --> (Product Page)
+    User --> (Recommendations)
+    (Search Bar) --> (Search API)
+    (Product Page) --> (Recommendation API)
+    (Recommendations) --> (Recommendation API)
+}
+
+package "Backend" {
+    [Recommendation API] --> [Recommendation Engine]
+    [Search API] --> [Search Engine]
+}
+
+package "Engines" {
+    [Recommendation Engine] --> [Collaborative Filtering]
+    [Recommendation Engine] --> [Content-Based Filtering]
+}
+
+package "Data and Models" {
+    database "Database" {
+        [User Behavior]
+        [Product Info]
+        [Search Logs]
+    }
+    [Model Registry] --> [Recommendation Engine]
+}
+
+[Recommendation Engine] --> [Database]
+[Search Engine] --> [Database]
+[Database] --> [New User Data Pipeline] : Process & Store
+@enduml

@@ -1,0 +1,107 @@
+@startuml recommendation_flow_with_weights
+!theme bluegray
+title Content-Based Filtering Search System Flow
+
+start
+
+:User Input: item_name (item to search for), top_n (number of recommendations);
+
+partition "Preprocess Query" {
+    :Convert item_name to lowercase and clean text (preprocess_text);
+    :Expand query with synonyms (expand_query_with_synonyms);
+    note right
+        Synonym expansion helps in finding items even with 
+        variations in terminology.
+    end note
+}
+
+partition "Exact Match Search" {
+    :Split expanded query into individual terms;
+    :Search for exact matches in the 'Name' field;
+    if (Exact Match Found?) then (Yes)
+        :Assign exact match weight to Score;
+    else (No)
+        :Move to next search step;
+    endif
+    note right
+        Exact matches get the highest weight as they directly 
+        match the query terms.
+    end note
+}
+
+partition "AI Vector Search (TF-IDF + Cosine Similarity)" {
+    :Combine text columns (Name, Description, Tags, Brand, Category) into Combined_Text;
+    :Convert Combined_Text into tfidf_matrix;
+    :Convert expanded query into input_vector;
+    :Calculate cosine similarity between input_vector and tfidf_matrix;
+    :Assign similarity scores weighted by ai_vector_weight;
+    note right
+        AI Vector Search uses TF-IDF to find relevant items based 
+        on text content similarity.
+    end note
+}
+
+partition "Category Match" {
+    :Check if any query term exists in 'Category' field;
+    if (Category Match Found?) then (Yes)
+        :Assign category weight to Score;
+    endif
+    note right
+        Category match helps refine results when the query 
+        includes specific product categories.
+    end note
+}
+
+partition "Word Search with Expanded Terms" {
+    :Search for query terms across multiple fields (Name, Brand, Tags, Description, Category);
+    :Combine results across fields;
+    :Assign word search weight to Score;
+    note right
+        Word Search increases flexibility by allowing partial 
+        matches across multiple fields.
+    end note
+}
+
+partition "Fuzzy Search" {
+    :For each field (Name, Brand, Tags, Description, Category), perform fuzzy matching;
+    :Calculate fuzzy match score with threshold (e.g., 80);
+    if (Fuzzy Match Found?) then (Yes)
+        :Assign fuzzy match weight to Score;
+    endif
+    note right
+        Fuzzy Search handles minor differences and typos 
+        in user input for better results.
+    end note
+}
+
+partition "Combine Scores and Rank" {
+    :Combine matches from all search steps;
+    :Sum scores by ProdID to calculate Final_Score;
+    note right
+        Combined ranking based on multiple search weights 
+        provides diverse and relevant recommendations.
+    end note
+}
+
+partition "Rating-Based Final Ranking" {
+    :Calculate Rating_Score, RatingCount_Score, and ReviewCount_Score;
+    :Combine these scores using weights (0.5 * Rating, 0.3 * RatingCount, 0.2 * ReviewCount);
+    :Adjust Final_Score based on Rating-based ranking;
+    :Sort items by Final_Score in ascending order;
+    :Select top N items based on Final_Score;
+    note right
+        Final ranking integrates quality and popularity, 
+        ensuring that highly-rated items appear at the top.
+    end note
+}
+
+partition "Output Recommendations" {
+    :Return recommended items with attributes such as Name, Rating, Price, Tags;
+    note right
+        Displaying product details helps users understand why 
+        specific items were recommended, adding transparency.
+    end note
+}
+
+stop
+@enduml
